@@ -1,0 +1,11 @@
+(function($) {
+	lazy_load_init();
+	$( 'body' ).bind( 'post-load', lazy_load_init ); // Work with WP.com infinite scroll
+
+	function lazy_load_init() {
+		$( 'img' ).lazyload( {
+			threshold: 200,
+			effect: 'fadeIn'
+		} );
+	}
+})( jQuery );
