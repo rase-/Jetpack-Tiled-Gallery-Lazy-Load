@@ -40,9 +40,6 @@ class LazyLoad_Images {
 		if ( false !== strpos( $content, 'data-lazy-src' ) )
 			return $content;
 
-		// In case you want to change the placeholder image
-		//$placeholder_image = apply_filters( 'lazyload_images_placeholder_image', self::get_url( 'images/1x1.trans.gif' ) );
-
 		// This is a pretty simple regex, but it works
 		// Remember to put data-lazy-src as the data attribute if you want to
 		// serve your images through photon. They work locally too, though
