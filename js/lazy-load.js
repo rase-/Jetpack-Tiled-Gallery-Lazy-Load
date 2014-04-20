@@ -5,7 +5,8 @@
 	function lazy_load_init() {
 		$( 'img' ).lazyload( {
 			threshold: 200,
-			effect: 'fadeIn'
+			effect: 'fadeIn',
+			data_attribute: 'lazy-src'
 		} );
 	}
 })( jQuery );
