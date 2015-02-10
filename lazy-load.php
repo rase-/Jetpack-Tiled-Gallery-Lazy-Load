@@ -1,7 +1,7 @@
 <?php
 /**
- * Plugin Name: jQuery Lazy Load For WordPress
- * Description: A plugin for lazy loading of images using the jQuery Lazy Load plugin
+ * Plugin Name: jQuery Lazy Load For Galleries
+ * Description: A plugin for lazy loading galleries of images using the jQuery Lazy Load plugin
  * Version: 0.0.1
  *
  * Based on the the WordPress lazy load plugin written by the WordPress.com VIP team at Automattic, the TechCrunch 2011 Redesign team, and Jake Goldman (10up LLC): http://wordpress.org/plugins/lazy-load/
@@ -21,9 +21,9 @@ class LazyLoad_Images {
 			return;
 
 		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'add_scripts' ) );
-		add_filter( 'the_content', array( __CLASS__, 'add_image_placeholders' ), 99 ); // run this later, so other content filters have run, including image_add_wh on WP.com
-		add_filter( 'post_thumbnail_html', array( __CLASS__, 'add_image_placeholders' ), 11 );
-		add_filter( 'get_avatar', array( __CLASS__, 'add_image_placeholders' ), 11 );
+
+		// Note: this needs to be added so that it's executed after the hook added by Jetpack
+		add_filter( 'post_gallery', array( __CLASS__, 'add_image_placeholders' ), 1002, 2 );
 	}
 
 	static function add_scripts() {
@@ -31,30 +31,28 @@ class LazyLoad_Images {
 		wp_enqueue_script( 'jquery-lazyload', self::get_url( 'js/jquery.lazyload.min.js' ), array( 'jquery' ), self::version, true );
 	}
 
-	static function add_image_placeholders( $content ) {
-		// Don't lazyload for feeds, previews, mobile
-		if( is_feed() || is_preview() || ( function_exists( 'is_mobile' ) && is_mobile() ) )
-			return $content;
+	static function add_image_placeholders( $val, $attrs ) {
+	// Don't lazy-load if the content has already been run through previously
+	if ( false !== strpos( $val, 'data-lazy-src' ) ) {
+		return $val;
+	}
 
-		// Don't lazy-load if the content has already been run through previously
-		if ( false !== strpos( $content, 'data-lazy-src' ) )
-			return $content;
+	// It's possible to filter based on gallery type here, for example
+	if ( 'square' !== $attrs['type'] ) {
+		return $val;
+	}
 
-		// This is a pretty simple regex, but it works
-		// Remember to put data-lazy-src as the data attribute if you want to
-		// serve your images through photon. They work locally too, though
-		$content = preg_replace( '#<img([^>]+?)src=[\'"]?([^\'"\s>]+)[\'"]?([^>]*)>#', sprintf( '<img${1}data-lazy-src="${2}"${3}><noscript><img${1}src="${2}"${3}></noscript>', $placeholder_image ), $content );
+	// This is a pretty simple regex, but it works
+	// Remember to put data-lazy-src as the data attribute if you want to
+	// serve your images through photon. They work locally too, though
+	$val = preg_replace( '#<img([^>]+?)src=[\'"]?([^\'"\s>]+)[\'"]?([^>]*)>#', sprintf( '<img${1}data-lazy-src="${2}"${3}><noscript><img${1}src="${2}"${3}></noscript>', $placeholder_image ), $val );
 
-		return $content;
+	return $val;
 	}
 
 	static function get_url( $path = '' ) {
 		return plugins_url( ltrim( $path, '/' ), __FILE__ );
 	}
-}
-
-function lazyload_images_add_placeholders( $content ) {
-	return LazyLoad_Images::add_image_placeholders( $content );
 }
 
 LazyLoad_Images::init();
