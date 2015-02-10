@@ -45,7 +45,7 @@ class LazyLoad_Images {
 	// This is a pretty simple regex, but it works
 	// Remember to put data-lazy-src as the data attribute if you want to
 	// serve your images through photon. They work locally too, though
-	$val = preg_replace( '#<img([^>]+?)src=[\'"]?([^\'"\s>]+)[\'"]?([^>]*)>#', sprintf( '<img${1}data-lazy-src="${2}"${3}><noscript><img${1}src="${2}"${3}></noscript>', $placeholder_image ), $val );
+	$val = preg_replace( '#<img([^>]+?)src=[\'"]?([^\'">]+)[\'"]?([^>]*)([^>]+?)style=[\'"]?([^\'">]+)[\'"]?([^>]*)>#', sprintf( '<img${1}data-lazy-src="${2}"${3}${4}style="display: none; ${5}"${6}><noscript><img${1}src="${2}"${3}${4}style="${5}"${6}></noscript>', $placeholder_image ), $val );
 
 	return $val;
 	}
